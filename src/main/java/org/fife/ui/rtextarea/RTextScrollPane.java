@@ -38,7 +38,7 @@ import javax.swing.JScrollPane;
  */
 public class RTextScrollPane extends JScrollPane {
 
-	private Gutter gutter;
+	protected Gutter gutter;
 
 
 	/**
@@ -288,7 +288,7 @@ public class RTextScrollPane extends JScrollPane {
 	 * @return The first descendant text area, or <code>null</code> if none
 	 *         is found.
 	 */
-	private static final RTextArea getFirstRTextAreaDescendant(Component comp) {
+	protected static final RTextArea getFirstRTextAreaDescendant(Component comp) {
 		Stack<Component> stack = new Stack<Component>();
 		stack.add(comp);
 		while (!stack.isEmpty()) {

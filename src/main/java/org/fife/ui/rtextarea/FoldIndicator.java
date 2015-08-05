@@ -607,6 +607,14 @@ public class FoldIndicator extends AbstractGutterComponent {
 	}
 
 
+		public void unsetTextArea(RTextArea textArea) {
+			if (this.textArea!=null) {
+				this.textArea.removePropertyChangeListener(
+						RSyntaxTextArea.CODE_FOLDING_PROPERTY, listener);
+			}
+		}
+
+
 	/**
 	 * The default +/- icon for expanding and collapsing folds.
 	 */

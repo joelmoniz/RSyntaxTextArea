@@ -81,7 +81,7 @@ public class Gutter extends JPanel {
 	/**
 	 * Renders line numbers.
 	 */
-	private LineNumberList lineNumberList;
+	protected LineNumberList lineNumberList;
 
 	/**
 	 * The color used to render line numbers.
@@ -796,6 +796,28 @@ public class Gutter extends JPanel {
 
 		this.textArea = textArea;
 
+	}
+
+
+	/**
+	 * Sets the text area being displayed.  This will clear any tracking
+	 * icons currently displayed.
+	 *
+	 * @param textArea The text area.
+	 */
+	public void unsetTextArea(RTextArea textArea) {
+		if (this.textArea!=null) {
+			listener.uninstall();
+		}
+
+		if (textArea!=null) {
+			if (lineNumberList!=null) {
+				lineNumberList.unsetTextArea(textArea);
+			}
+			if (foldIndicator!=null) {
+				foldIndicator.setTextArea(textArea);
+			}
+		}
 	}
 
 

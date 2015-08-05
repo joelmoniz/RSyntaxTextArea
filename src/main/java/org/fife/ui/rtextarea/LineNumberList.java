@@ -20,7 +20,9 @@ import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.HashMap;
 import java.util.Map;
+
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
@@ -81,6 +83,7 @@ public class LineNumberList extends AbstractGutterComponent
 	 */
 	private int lineNumberingStartIndex;
 
+	private HashMap<Integer, String> debugSymbolsMap;
 
 	/**
 	 * Constructs a new <code>LineNumberList</code> using default values for
@@ -112,6 +115,8 @@ public class LineNumberList extends AbstractGutterComponent
 		else {
 			setForeground(Color.GRAY);
 		}
+		
+		debugSymbolsMap = new HashMap<Integer, String>();
 
 	}
 
@@ -232,7 +237,15 @@ public class LineNumberList extends AbstractGutterComponent
 	}
 
 
-	public void mouseClicked(MouseEvent e) {
+	public void mouseClicked(MouseEvent e) {/*
+		int pos = textArea.viewToModel(new Point(0, e.getY())) + 1;
+		if (debugSymbolsMap.containsKey(pos)) {
+			debugSymbolsMap.remove(pos);
+		}
+		else {
+			debugSymbolsMap.put(pos, "<>");
+		}
+		repaint();*/
 	}
 
 
@@ -356,7 +369,15 @@ public class LineNumberList extends AbstractGutterComponent
 			int rhs = getWidth() - RHS_BORDER_WIDTH;
 			int line = topLine + 1;
 			while (y<visibleRect.y+visibleRect.height+ascent && line<=textArea.getLineCount()) {
-				String number = Integer.toString(line + getLineNumberingStartIndex() - 1);
+				int index = line + getLineNumberingStartIndex() - 1;
+				String number;
+				if (debugSymbolsMap.containsKey(index)) {
+					number = debugSymbolsMap.get(index);
+				}
+				else {
+					number = Integer.toString(index);
+				}
+	      
 				int width = metrics.stringWidth(number);
 				g.drawString(number, rhs-width,y);
 				y += cellHeight;
@@ -381,7 +402,14 @@ public class LineNumberList extends AbstractGutterComponent
 		else { // rtl
 			int line = topLine + 1;
 			while (y<visibleRect.y+visibleRect.height && line<textArea.getLineCount()) {
-				String number = Integer.toString(line + getLineNumberingStartIndex() - 1);
+				int index = line + getLineNumberingStartIndex() - 1;
+				String number;
+				if (debugSymbolsMap.containsKey(index)) {
+					number = debugSymbolsMap.get(index);
+				}
+				else {
+					number = Integer.toString(index);
+				}
 				g.drawString(number, RHS_BORDER_WIDTH, y);
 				y += cellHeight;
 				if (fm!=null) {
@@ -493,7 +521,13 @@ public class LineNumberList extends AbstractGutterComponent
 
 			// Paint the line number.
 			int index = (topLine+1) + getLineNumberingStartIndex() - 1;
-			String number = Integer.toString(index);
+			String number;
+			if (debugSymbolsMap.containsKey(index)) {
+				number = debugSymbolsMap.get(index);
+			}
+			else {
+				number = Integer.toString(index);
+			}
 			if (ltr) {
 				int strWidth = metrics.stringWidth(number);
 				g.drawString(number, rhs-strWidth,y+ascent);
@@ -607,6 +641,13 @@ public class LineNumberList extends AbstractGutterComponent
 	}
 
 
+		public void unsetTextArea(RTextArea textArea) {
+			if (this.textArea!=null) {
+				l.uninstall(textArea);
+			}
+		}
+
+
 	/**
 	 * Changes the height of the cells in the JList so that they are as tall as
 	 * font. This function should be called whenever the user changes the Font
@@ -654,6 +695,31 @@ public class LineNumberList extends AbstractGutterComponent
 			revalidate();
 		}
 
+	}
+
+
+	public void addDebugSymbol(int line, String symbol) {
+		debugSymbolsMap.put(line, symbol);
+		updateCellWidths();
+		repaint();
+	}
+
+
+	public void removeDebugSymbol(int line) {
+		debugSymbolsMap.remove(line);
+		updateCellWidths();
+		repaint();
+	}
+
+
+	public void clearDebugSymbols() {
+		debugSymbolsMap.clear();
+		repaint();
+	}
+
+
+	public String getDebugSymbol(int line) {
+		return debugSymbolsMap.get(line);
 	}
 
 
